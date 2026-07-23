@@ -1,0 +1,18 @@
+{
+  "Tokyo": {
+    "weather": "Sunny",
+    "temperature": 30
+  },
+  "Osaka": {
+    "weather": "Cloudy",
+    "temperature": 28
+  },
+  "Sapporo": {
+    "weather": "Rain",
+    "temperature": 21
+  },
+  "Fukuoka": {
+    "weather": "Sunny",
+    "temperature": 31
+  }
+}

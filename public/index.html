@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>MCP WebSocket Tester</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    margin: 30px;
+}
+
+textarea {
+    width: 100%;
+    height: 220px;
+    font-family: Consolas, monospace;
+    font-size: 14px;
+}
+
+button {
+    padding: 8px 16px;
+    margin-right: 10px;
+}
+
+#status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: gray;
+    color: white;
+}
+
+#log {
+    margin-top: 20px;
+    padding: 10px;
+    height: 300px;
+    overflow: auto;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    white-space: pre-wrap;
+    font-family: Consolas, monospace;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>MCP WebSocket Tester</h2>
+
+<div>
+    状態：
+    <span id="status">未接続</span>
+</div>
+
+<br>
+
+<button id="connect">接続</button>
+<button id="disconnect">切断</button>
+<label for="location">場所：</label>
+
+<select id="location">
+    <option value="Tokyo">Tokyo</option>
+    <option value="Osaka">Osaka</option>
+    <option value="Sapporo">Sapporo</option>
+    <option value="Fukuoka">Fukuoka</option>
+    <option value="H5gs4gre">存在しない</option>
+    <option value="">未指定</option>
+</select>
+
+<button id="send">送信</button>
+<button id="clear">ログクリア</button>
+
+<br><br>
+
+<textarea id="request">
+{
+    "id": 1,
+    "method": "weather.get",
+    "params": {
+        "location": "Tokyo"
+    }
+}
+</textarea>
+
+<div id="log"></div>
+
+<script>
+
+let ws = null;
+
+const status = document.getElementById("status");
+const log = document.getElementById("log");
+const request = document.getElementById("request");
+
+function println(message) {
+
+    const time = new Date().toLocaleTimeString();
+
+    log.textContent += `[${time}] ${message}\n\n`;
+
+    log.scrollTop = log.scrollHeight;
+}
+
+document.getElementById("connect").onclick = () => {
+
+    if (ws) {
+        return;
+    }
+
+    ws = new WebSocket("ws://localhost:3000/mcp");
+
+    ws.onopen = () => {
+
+        status.textContent = "接続中";
+        status.style.background = "green";
+
+        println("Connected");
+
+    };
+
+    ws.onmessage = (event) => {
+
+        println("Receive\n" + event.data);
+
+    };
+
+    ws.onclose = () => {
+
+        println("Disconnected");
+
+        status.textContent = "未接続";
+        status.style.background = "gray";
+
+        ws = null;
+
+    };
+
+    ws.onerror = (event) => {
+
+        println("WebSocket Error");
+
+        console.error(event);
+
+    };
+
+};
+
+document.getElementById("disconnect").onclick = () => {
+
+    if (ws) {
+        ws.close();
+    }
+
+};
+
+const locationSelect = document.getElementById("location");
+locationSelect.onchange = () => {
+
+    request.value = JSON.stringify({
+        id: 1,
+        method: "weather.get",
+        params: {
+            location: locationSelect.value
+        }
+    }, null, 2);
+
+};
+
+document.getElementById("send").onclick = () => {
+
+    if (!ws) {
+        alert("先に接続してください");
+        return;
+    }
+
+    const request = {
+        id: Date.now(),
+        method: "weather.get",
+        params: {
+            location: locationSelect.value
+        }
+    };
+
+    const json = JSON.stringify(request, null, 2);
+
+    println("Send\n" + json);
+
+    ws.send(JSON.stringify(request));
+
+};
+
+document.getElementById("clear").onclick = () => {
+
+    log.textContent = "";
+
+};
+
+</script>
+
+</body>
+</html>
