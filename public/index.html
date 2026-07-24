@@ -57,8 +57,14 @@ button {
 
 <button id="connect">接続</button>
 <button id="disconnect">切断</button>
-<label for="location">場所：</label>
 
+<label for="provider">取得元：</label>
+<select id="provider">
+    <option value="mock">モック</option>
+    <option value="api">外部API</option>
+</select>
+
+<label for="location">場所：</label>
 <select id="location">
     <option value="Tokyo">Tokyo</option>
     <option value="Osaka">Osaka</option>
@@ -154,6 +160,7 @@ document.getElementById("disconnect").onclick = () => {
 
 };
 
+const providerSelect = document.getElementById("provider");
 const locationSelect = document.getElementById("location");
 locationSelect.onchange = () => {
 
@@ -178,16 +185,15 @@ document.getElementById("send").onclick = () => {
         id: Date.now(),
         method: "weather.get",
         params: {
+            provider: providerSelect.value,
             location: locationSelect.value
         }
     };
 
-    const json = JSON.stringify(request, null, 2);
-
-    println("Send\n" + json);
+    println("Send");
+    println(JSON.stringify(request, null, 2));
 
     ws.send(JSON.stringify(request));
-
 };
 
 document.getElementById("clear").onclick = () => {

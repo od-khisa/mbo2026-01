@@ -1,19 +1,19 @@
-const weatherData = require("../mock/weather.json");
+const mockProvider = require("./mockWeatherProvider");
+const apiProvider = require("./apiWeatherProvider");
 
-function getWeather(location) {
-  const result = weatherData[location];
+async function getWeather(provider, location) {
 
-  if (!result) {
-    return null;
-  }
+    switch (provider) {
 
-  return {
-    location,
-    weather: result.weather,
-    temperature: result.temperature
-  };
+        case "api":
+            return await apiProvider.getWeather(location);
+
+        case "mock":
+        default:
+            return mockProvider.getWeather(location);
+    }
 }
 
 module.exports = {
-  getWeather
+    getWeather
 };

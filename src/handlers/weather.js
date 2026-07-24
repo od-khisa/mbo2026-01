@@ -1,6 +1,6 @@
 const weatherService = require("../services/weatherService");
 
-function handleWeather(request) {
+async function handleWeather(request) {
   const location = request.params?.location;
 
   if (!location) {
@@ -12,7 +12,12 @@ function handleWeather(request) {
     };
   }
 
-  const weather = weatherService.getWeather(location);
+  const provider = request.params.provider || "mock";
+
+  const weather = await weatherService.getWeather(
+      provider,
+      request.params.location
+  );
 
   if (!weather) {
     return {

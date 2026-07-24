@@ -28,7 +28,7 @@ wss.on("connection", (ws) => {
   console.log("Client connected");
 
   // メッセージ受信
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     console.log("[Receive]", message.toString());
 
     let request;
@@ -47,9 +47,9 @@ wss.on("connection", (ws) => {
     }
 
     // 仮実装
-
     if (request.method === "weather.get") {
-        const response = weatherHandler.handleWeather(request);
+        // const response = weatherHandler.handleWeather(request);
+        const response = await weatherHandler.handleWeather(request);
         console.log("[Send]", response);
         ws.send(JSON.stringify(response));
     } else {
